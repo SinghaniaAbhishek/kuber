@@ -1,14 +1,12 @@
 💰 KUBER – Personal Finance Simplifier
 
-
 The website is deployed.
 
 A pastel-themed, gamified, AI-assisted finance dashboard for smarter money habits.
-Built for the Hackathon 2025 🏆
 
 🧭 Overview
 
-Kuber helps users take control of their money with beautiful visual dashboards, goal tracking, and an AI Assistant that summarizes your financial life — all running locally in the browser (no backend needed).
+Kuber helps users take control of their money with beautiful visual dashboards, goal tracking, and an AI Assistant that summarizes your financial life.
 
 ✨ Features include:
 
@@ -173,30 +171,6 @@ Monthly Snapshot — Oct 2025
 
 🪙 Badges: first-saver
 
-🧱 Local Data (MOCK_DATA)
-{
-  "user": { "id": "u1", "name": "Abhishek", "email": "abhishek@example.com" },
-  "settings": { "theme": "dreamy", "currency": "INR", "monthlyBudget": 25000 },
-  "income": [ ... ],
-  "expenses": [ ... ],
-  "goals": [ ... ],
-  "bills": [ ... ],
-  "subscriptions": [ ... ],
-  "debts": [ ... ],
-  "challenges": [ ... ],
-  "badges": ["first-saver"]
-}
-
-🧩 Demo Steps (For Judges)
-
-🎯 Interactive panel available on Dashboard — these actions are clickable inside the app.
-
-Step	Action
-1️⃣	Open Dashboard → view totals & charts
-2️⃣	Mark Netflix bill “Paid” → adds expense + advances due date
-3️⃣	Add ₹100 to Trip to Goa → triggers confetti 🎉
-4️⃣	Export Expenses CSV (Settings → Export)
-5️⃣	Ask AI Assistant: “Summarize my finances for Oct 2025”
 🚀 Run Locally
 git clone https://github.com/yourusername/kuber.git
 cd kuber
@@ -205,7 +179,6 @@ npm start
 
 
 🪄 Opens http://localhost:5173/ (Vite)
-First run auto-seeds mock data into localStorage['pfs_data'].
 
 🧠 Judge Checklist
 
@@ -221,8 +194,6 @@ First run auto-seeds mock data into localStorage['pfs_data'].
 
 🏆 Why KUBER Stands Out
 
-💎 Offline-first architecture (no backend needed)
-
 🤖 AI summarization for human-like insights
 
 🪄 Playful gamification (badges, confetti, challenges)
@@ -231,14 +202,5 @@ First run auto-seeds mock data into localStorage['pfs_data'].
 
 📈 Live-updating visualizations
 
-🧭 Future Enhancements
-
-Cloud sync (Firebase / Supabase)
-
-Real LLM assistant integration
-
-Smart bill predictions
-
-Shared budgets & multi-user mode
 
 “Master your money, don’t let it master you.” — Team Kuber 💚
