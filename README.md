@@ -1,206 +1,143 @@
-💰 KUBER – Personal Finance Simplifier
+💰 KUBER — Personal Finance Simplifier
 
-The website is deployed.
+“Master your money, don’t let it master you.” — Team Kuber 💚
 
-A pastel-themed, gamified, AI-assisted finance dashboard for smarter money habits.
+A pastel-themed, gamified, and visually delightful personal finance web app built to make money management simple, beautiful, and stress-free.
+
+Kuber empowers users to track, visualize, and celebrate their financial progress with an elegant dashboard and intuitive tools.
 
 🧭 Overview
 
-Kuber helps users take control of their money with beautiful visual dashboards, goal tracking, and an AI Assistant that summarizes your financial life.
+Managing money shouldn't be anxiety-inducing — it should feel rewarding.
+KUBER helps users build healthier financial habits with features like expense tracking, savings goals, bill reminders, insights, and an on-page AI Assistant — all wrapped in a pastel, glassmorphic UI that radiates calm and confidence.
 
-✨ Features include:
+✨ Key Features
+💸 Smart Expense & Budget Tracking
 
-💸 Income, Expense, and Budget Tracking
+  Categorize and manage income and expenses
+  Dynamic budget bar (turns yellow/red as limit nears)
+  Clean visual summaries with pie & line charts
 
-🎯 Goal Progress + Confetti Celebrations
+🎯 Savings Goal Visualizer
 
-📅 Bill & Subscription Reminders
-
-🤖 On-page AI Finance Assistant
-
-📊 Visual Insights & Challenges
-
-📁 CSV Export + Offline LocalStorage persistence
-
-⚙ Tech Stack
-Layer	Tech Used
-🧩 Frontend	React (Hooks + Context API)
-💅 Styling	Tailwind CSS (pastel + glassmorphic aesthetic)
-📈 Charts	Recharts (or Chart.js)
-🎞 Animation	Framer Motion (for smooth transitions & confetti)
-🗓 Date Utils	date-fns
-📄 CSV	papaparse
-💾 Persistence	localStorage (seeded with mock data)
-💬 AI Assistant	Local summarizer (optional LLM integration)
-🪄 UX Design Goals
-
-✅ Soft pastel + professional color scheme (navy/charcoal text)
-✅ Rounded corners + glassy cards + shadows
-✅ Fully responsive (desktop / tablet / mobile)
-✅ Friendly microcopy & emojis 😄
-✅ Accessibility: Semantic HTML, labeled inputs, keyboard navigation
-
-🧠 App Structure
-src/
- ├── data/
- │    └── mock.js            # Seed data (MOCK_DATA)
- ├── context/
- │    └── DataProvider.jsx   # Central useData() hook
- ├── pages/
- │    ├── Dashboard.jsx
- │    ├── Expenses.jsx
- │    ├── Goals.jsx
- │    ├── Bills.jsx
- │    ├── Debts.jsx
- │    ├── Insights.jsx
- │    ├── Challenge.jsx
- │    └── Settings.jsx
- ├── components/
- │    ├── StatCard.jsx
- │    ├── AddExpenseModal.jsx
- │    ├── GoalConfetti.jsx
- │    ├── Charts/
- │    │    ├── PieChartView.jsx
- │    │    └── LineChartView.jsx
- │    └── AiAssistant.jsx
- ├── utils/
- │    └── format.js          # currency & date helpers
- ├── App.jsx
- └── index.jsx
-
-🧾 Core Features
-🏠 Dashboard
-
-“Good evening, Abhishek — You’re doing great 💚”
-
-Stat cards for Income, Expense, Net, Budget Remaining
-
-Category pie chart + 3-month trend chart
-
-Upcoming bills + Quick actions (Add Expense / Goal / Bill)
-
-💰 Expense Tracker
-
-Full CRUD (Add, Edit, Delete)
-
-Table on desktop, cards on mobile
-
-Budget progress bar updates live
-
-🎯 Savings Goals
-
-Track progress visually
-
-Add to goal → trigger confetti 🎉
-
-Earn badges upon completion
+  Set financial goals and track progress visually
+  Progress animations with confetti celebrations 🎉
+  Unlockable badges for achievements
 
 📅 Bills & Subscriptions
 
-Days-left counter
-
-“Mark Paid” → optionally auto-add expense + advance due date
+  Bill tracker with due date countdown
+  Mark Paid → updates expense + advances due date
+  Gentle color coded reminders
 
 🤝 Debt & Split Tracker
 
-Tabs: I Owe / Owed to Me
+  Tabs for “I Owe” and “Owed to Me”
+  Simple settlement flows and optional sync with expenses
 
-Manage debts, mark paid, sync with expenses
+📊 Insights & Reports
 
-📊 Insights
+  6-month trend charts (Income vs Expense)
+  Category-wise heatmap visualization
+  Animated counters for totals and comparisons
 
-6-month Income vs Expense chart
+🧩 Budget Challenges
 
-Calendar heatmap / spend activity view
+  Create monthly saving/spending challenges
+  Live circular progress tracke
+  Achievement badges: Smart Saver, Goal Getter, Bill Ninja 🏅
 
-Animated counters: Spent / Saved / Remaining
+🤖 AI Assistant (On-Page) — NEW & IMPROVED
 
-🧩 Budget Challenge
+  Kuber includes a friendly AI Assistant that summarizes your finances, answers natural-language queries, and surfaces quick actions — designed to be helpful, private, and judge-friendly.
 
-Create personal monthly challenges
+  Capabilities (sample queries):
 
-Track progress via ring chart
+    “Summarize my finances for Oct 2025.”
+    “Show upcoming bills in the next 7 days.”
+    “How much did I spend on subscriptions this month?”
+    “Which goal is closest to completion?”
 
-Badge rewards on success 🏅
+⚙️ Tech Stack
+  🧩 Frontend
+    Layer	Tech Used
+    Framework	React (Vite + Hooks + Context API)
+    Styling	Tailwind CSS (glassmorphic + pastel theme)
+    Animations	Framer Motion
+    Charts	Recharts
+    Utilities	date-fns, papaparse
+    TDeployment Vercel
+  🧠 Backend
+    Layer	Tech Used
+    Framework	Node.js + Express
+    Database	MongoDB (Mongoose ORM)
+    API Auth	JWT (JSON Web Token)
+    Scheduler	node-cron (for reminders)
+    AI Summarizer	Local summarizer logic using data aggregation
+    File Handling	Multer (for CSV import/export)
+    Deployment	Railway (backend)
 
-⚙ Settings
+🧱 System Architecture
+  Frontend (React + Tailwind)
+      ↓ REST API (Axios)
+  Backend (Node + Express)
+      ↓
+  MongoDB (Atlas / Local)
 
-Theme selector: Light / Dark / Dreamy 🌙
 
-Export CSV for Expenses, Goals, Bills
+🧠 AI Summarizer Logic
 
-Reset to mock data
+  Reads from user’s financial data (income, expenses, goals, bills)
+  Aggregates totals, identifies upcoming bills, and detects trends
+  Generates structured natural text summaries
 
-🤖 AI Assistant
 
-A friendly chatbot that summarizes your financial data — completely offline.
-
-💡 Capabilities:
-
-“Summarize my finances for Oct 2025”
-
-“Show upcoming bills in next 7 days”
-
-“How much did I spend on subscriptions?”
-
-“Summarize my goals”
-
-🧩 Implementation
-
-Local summarizer reads from pfs_data in localStorage
-
-Optional LLM integration (if desired via proxy)
-
-Response cards with print / copy buttons
-
-🧮 Example Response
-
-Monthly Snapshot — Oct 2025
-
-💰 Income: ₹28,000
-
-💸 Expenses: ₹5,139
-
-💵 Net: ₹22,861
-
-🧾 Upcoming Bills: WiFi ₹699 (3 days), Electricity ₹1,800 (5 days)
-
-🎯 Goals: Trip to Goa 75% • Laptop 25%
-
-🏆 Challenge: “Under ₹5000 Oct” — 76% used
-
-🪙 Badges: first-saver
+🗂️ Project Structure
+src/
+ ├── backend/
+ │    ├── server.js
+ │    ├── routes/
+ │    │    ├── expenseRoutes.js
+ │    │    ├── goalRoutes.js
+ │    │    ├── billRoutes.js
+ │    │    └── aiRoutes.js
+ │    ├── controllers/
+ │    ├── models/
+ │    └── utils/
+ ├── frontend/
+ │    ├── components/
+ │    ├── pages/
+ │    ├── context/
+ │    ├── data/mock.js
+ │    └── App.jsx
+ └── package.json
 
 🚀 Run Locally
+# Clone repo
 git clone https://github.com/yourusername/kuber.git
 cd kuber
+
+# Install dependencies
 npm install
+
+# Start backend
+cd backend
 npm start
 
+# Start frontend
+cd frontend
+npm run dev
 
-🪄 Opens http://localhost:5173/ (Vite)
-
-🧠 Judge Checklist
-
-✅ App seeds localStorage correctly
-✅ Dashboard stats & charts render properly
-✅ Expense CRUD updates dashboard instantly
-✅ Mark-Paid logic works (advance date + optional expense)
-✅ Goal completion triggers confetti + badge
-✅ CSV export downloads file
-✅ Reset restores mock data
-✅ AI Assistant summarizes accurately
-✅ Responsive on desktop + mobile
 
 🏆 Why KUBER Stands Out
 
-🤖 AI summarization for human-like insights
+🌈 Pastel-themed professional UI (eye-soothing + elegant)
+🤖 AI summarizer for natural insights
+🎮 Gamified finance with badges & confetti
+📊 Live charts + analytics
+🧩 Full-stack integration (React + Node + MongoDB)
+💾 Persistent local & cloud data
+📱 Responsive, accessible, and delightful UX
 
-🪄 Playful gamification (badges, confetti, challenges)
-
-💡 Beautiful design + accessibility
-
-📈 Live-updating visualizations
-
-
-“Master your money, don’t let it master you.” — Team Kuber 💚
+💚 Team KUBER
+Building healthier financial habits — one pastel dashboard at a time.
