@@ -13,7 +13,7 @@ import Debts from "./pages/Debts";
 import Insights from "./pages/Insights";
 import ChallengePage from "./pages/Challenge";
 import Settings from "./pages/Settings";
-import DemoSteps from "./components/DemoSteps";
+
 import FinanceChatbot from "./components/FinanceChatbot";
 import NotFound from "./pages/NotFound";
 
@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <DemoSteps />
+    
           <FinanceChatbot />
         </BrowserRouter>
       </DataProvider>
