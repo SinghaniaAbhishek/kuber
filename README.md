@@ -1,5 +1,8 @@
 💰 KUBER – Personal Finance Simplifier
 
+
+The website is deployed.
+
 A pastel-themed, gamified, AI-assisted finance dashboard for smarter money habits.
 Built for the Hackathon 2025 🏆
 
