@@ -114,7 +114,7 @@ src/
 
 🚀 Run Locally
 # Clone repo
-git clone https://github.com/yourusername/kuber.git
+git clone https://github.com/SinghaniaAbhishek/kuber.git
 cd kuber
 
 # Install dependencies
