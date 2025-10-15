@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Wallet, TrendingUp, Target, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import api, { setAuthToken } from '@/lib/api';
+import { useData } from '@/contexts/DataContext';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -14,14 +16,29 @@ const Welcome = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { refreshData } = useData();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      toast.success('Welcome back! 🎉');
-    } else {
-      toast.success('Account created successfully! 🎊');
+    try {
+      if (isLogin) {
+        const { token } = await api.login(email, password);
+        if (token) {
+          setAuthToken(token);
+          toast.success('Welcome back! 🎉');
+        }
+      } else {
+        const { token } = await api.signup(name, email, password);
+        if (token) {
+          setAuthToken(token);
+          toast.success('Account created successfully! 🎊');
+        }
+      }
+      // ensure data is loaded before navigating
+      await refreshData();
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast.error(err?.message || 'Authentication failed');
     }
-    navigate('/dashboard');
   };
 
   const features = [
@@ -46,7 +63,7 @@ const Welcome = () => {
                 Personal Finance
               </span>
               <br />
-              Simplified
+              Kuber
             </h1>
             <p className="text-xl text-muted-foreground">
               Take control of your money with clarity and confidence 💚

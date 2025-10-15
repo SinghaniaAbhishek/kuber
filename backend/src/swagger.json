@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Personal Finance Simplifier API",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "/api" }],
+  "paths": {
+    "/health": { "get": { "summary": "Health check", "responses": { "200": { "description": "OK" } } } },
+    "/auth/signup": { "post": { "summary": "Signup", "responses": { "201": { "description": "Created" } } } },
+    "/auth/login": { "post": { "summary": "Login", "responses": { "200": { "description": "OK" } } } },
+    "/auth/me": { "get": { "summary": "Current user", "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } } } }
+  }
+}
+

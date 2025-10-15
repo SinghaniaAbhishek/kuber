@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { MOCK_DATA } from '@/lib/mockData';
+import api, { getAuthToken } from '@/lib/api';
 
 export interface User {
   id: string;
@@ -86,35 +86,88 @@ interface DataContextType {
   data: AppData;
   updateData: (newData: Partial<AppData>) => void;
   resetData: () => void;
+  refreshData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [data, setData] = useState<AppData>(() => {
-    const stored = localStorage.getItem('pfs_data');
-    if (!stored) {
-      localStorage.setItem('pfs_data', JSON.stringify(MOCK_DATA));
-      return MOCK_DATA as AppData;
-    }
-    return JSON.parse(stored);
-  });
+  const [data, setData] = useState<AppData>(() => ({
+    user: { id: '', name: '', email: '' },
+    settings: { theme: 'dreamy', currency: 'INR', monthlyBudget: 0 },
+    income: [],
+    expenses: [],
+    goals: [],
+    bills: [],
+    subscriptions: [],
+    debts: [],
+    challenges: [],
+    badges: [],
+  }));
 
-  const updateData = (newData: Partial<AppData>) => {
-    setData(prev => {
-      const updated = { ...prev, ...newData };
-      localStorage.setItem('pfs_data', JSON.stringify(updated));
-      return updated;
-    });
+  const refreshData = async () => {
+    const token = getAuthToken();
+    if (!token) return;
+    try {
+      const me = await api.me();
+      const [theme, budget, income, expenses, goals, bills, subscriptions, debts, challenges, badges] = await Promise.all([
+        api.getTheme(),
+        api.getBudget(),
+        api.list('income'),
+        api.list('expenses'),
+        api.list('goals'),
+        api.list('bills'),
+        api.list('subscriptions'),
+        api.list('debts'),
+        api.list('challenges'),
+        api.list('badges'),
+      ]);
+      const badgeNames = Array.isArray(badges) ? badges.map((b: any) => b.name) : [];
+      setData({
+        user: me,
+        settings: { theme: theme.theme, currency: budget.currency, monthlyBudget: budget.monthlyBudget },
+        income,
+        expenses,
+        goals,
+        bills,
+        subscriptions,
+        debts,
+        challenges,
+        badges: badgeNames,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
   };
 
-  const resetData = () => {
-    localStorage.setItem('pfs_data', JSON.stringify(MOCK_DATA));
-    setData(MOCK_DATA as AppData);
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  const updateData = (newData: Partial<AppData>) => {
+    // local state only; backend writes should be performed by callers via api
+    setData(prev => ({ ...prev, ...newData }));
+  };
+
+  const resetData = async () => {
+    try {
+      await api.resetData();
+      // re-fetch after reset
+      const [theme, budget] = await Promise.all([api.getTheme(), api.getBudget()]);
+      setData(prev => ({
+        ...prev,
+        settings: { theme: theme.theme, currency: budget.currency, monthlyBudget: budget.monthlyBudget },
+        income: [], expenses: [], goals: [], bills: [], subscriptions: [], debts: [], challenges: [], badges: [],
+      }));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
   };
 
   return (
-    <DataContext.Provider value={{ data, updateData, resetData }}>
+    <DataContext.Provider value={{ data, updateData, resetData, refreshData }}>
       {children}
     </DataContext.Provider>
   );

@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Layout from '@/components/Layout';
+import api from '@/lib/api';
 
 const Goals = () => {
   const { data, updateData } = useData();
@@ -24,32 +25,36 @@ const Goals = () => {
     saved: '0'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newGoal: Goal = {
-      id: editingId || `g${Date.now()}`,
+    const payload = {
       name: formData.name,
       target: parseFloat(formData.target),
       saved: parseFloat(formData.saved)
     };
-
-    if (editingId) {
-      updateData({
-        goals: data.goals.map(g => g.id === editingId ? newGoal : g)
-      });
-      toast.success('Goal updated!');
-    } else {
-      updateData({
-        goals: [...data.goals, newGoal]
-      });
-      toast.success('Goal created! 🎯');
+    try {
+      if (editingId) {
+        const updated = await api.update('goals', editingId, payload);
+        if (updated) {
+          updateData({ goals: data.goals.map(g => g.id === editingId ? updated as Goal : g) });
+          toast.success('Goal updated!');
+        }
+      } else {
+        const created = await api.create('goals', payload);
+        if (created) {
+          updateData({ goals: [...data.goals, created as Goal] });
+          toast.success('Goal created! 🎯');
+        }
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save goal');
     }
 
     setIsOpen(false);
     resetForm();
   };
 
-  const handleAddToGoal = () => {
+  const handleAddToGoal = async () => {
     if (!selectedGoalId || !addAmount) return;
     
     const goal = data.goals.find(g => g.id === selectedGoalId);
@@ -75,24 +80,28 @@ const Goals = () => {
       }
     }
 
-    updateData({
-      goals: data.goals.map(g => 
-        g.id === selectedGoalId 
-          ? { ...g, saved: Math.min(newSaved, g.target) }
-          : g
-      )
-    });
+    try {
+      const updated = await api.update('goals', goal.id, { saved: Math.min(newSaved, goal.target) });
+      if (updated) {
+        updateData({ goals: data.goals.map(g => g.id === goal.id ? updated as Goal : g) });
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update goal');
+    }
 
     setIsAddOpen(false);
     setAddAmount('');
     setSelectedGoalId(null);
   };
 
-  const handleDelete = (id: string) => {
-    updateData({
-      goals: data.goals.filter(g => g.id !== id)
-    });
-    toast.success('Goal deleted');
+  const handleDelete = async (id: string) => {
+    try {
+      await api.remove('goals', id);
+      updateData({ goals: data.goals.filter(g => g.id !== id) });
+      toast.success('Goal deleted');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to delete goal');
+    }
   };
 
   const handleEdit = (goal: Goal) => {

@@ -9,6 +9,7 @@ import { formatCurrency, formatDate } from '@/lib/utils/format';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Layout from '@/components/Layout';
+import api from '@/lib/api';
 
 const Expenses = () => {
   const { data, updateData } = useData();
@@ -25,10 +26,9 @@ const Expenses = () => {
   const categories = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Subscriptions', 'Other'];
   const modes = ['Cash', 'UPI', 'Card', 'Net Banking'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newExpense: Expense = {
-      id: editingId || `e${Date.now()}`,
+    const payload = {
       date: formData.date,
       amount: parseFloat(formData.amount),
       category: formData.category,
@@ -36,27 +36,36 @@ const Expenses = () => {
       note: formData.note
     };
 
-    if (editingId) {
-      updateData({
-        expenses: data.expenses.map(exp => exp.id === editingId ? newExpense : exp)
-      });
-      toast.success('Expense updated successfully!');
-    } else {
-      updateData({
-        expenses: [...data.expenses, newExpense]
-      });
-      toast.success('Expense added successfully!');
+    try {
+      if (editingId) {
+        const updated = await api.update('expenses', editingId, payload);
+        if (updated) {
+          updateData({ expenses: data.expenses.map(exp => exp.id === editingId ? updated as Expense : exp) });
+          toast.success('Expense updated successfully!');
+        }
+      } else {
+        const created = await api.create('expenses', payload);
+        if (created) {
+          updateData({ expenses: [...data.expenses, created as Expense] });
+          toast.success('Expense added successfully!');
+        }
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save expense');
     }
 
     setIsOpen(false);
     resetForm();
   };
 
-  const handleDelete = (id: string) => {
-    updateData({
-      expenses: data.expenses.filter(exp => exp.id !== id)
-    });
-    toast.success('Expense deleted');
+  const handleDelete = async (id: string) => {
+    try {
+      await api.remove('expenses', id);
+      updateData({ expenses: data.expenses.filter(exp => exp.id !== id) });
+      toast.success('Expense deleted');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to delete');
+    }
   };
 
   const handleEdit = (expense: Expense) => {

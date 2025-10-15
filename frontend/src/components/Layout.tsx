@@ -30,7 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
         <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
           Finance Simplifier
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Hey, {data.user.name}! 👋</p>
+        <p className="text-sm text-muted-foreground mt-1">Hey, <span className="font-semibold">{data.user.name || 'there'}</span>! 👋</p>
       </div>
       {navItems.map(({ path, icon: Icon, label }) => (
         <Link key={path} to={path}>

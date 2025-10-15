@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,30 +8,52 @@ import { exportToCSV } from '@/lib/utils/export';
 import { toast } from 'sonner';
 import { Download, RefreshCw, Moon, Sun, Palette } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { useNavigate } from 'react-router-dom';
+import { setAuthToken } from '@/lib/api';
+import api from '@/lib/api';
 
 const Settings = () => {
   const { data, updateData, resetData } = useData();
+  const navigate = useNavigate();
   const [theme, setTheme] = useState(data.settings.theme);
   const [monthlyBudget, setMonthlyBudget] = useState(data.settings.monthlyBudget.toString());
 
-  const handleSaveSettings = () => {
-    updateData({
-      settings: {
-        ...data.settings,
-        theme,
-        monthlyBudget: parseFloat(monthlyBudget)
+  useEffect(() => {
+    // Ensure latest user info is fetched from backend for About/Account section
+    (async () => {
+      try {
+        const me = await api.me();
+        if (me && (me.name !== data.user.name || me.email !== data.user.email)) {
+          updateData({ user: me });
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const handleSaveSettings = async () => {
+    try {
+      await api.setTheme(theme);
+      await api.setBudget(parseFloat(monthlyBudget), data.settings.currency);
+      updateData({
+        settings: {
+          ...data.settings,
+          theme,
+          monthlyBudget: parseFloat(monthlyBudget)
+        }
+      });
+
+      // Apply theme
+      document.documentElement.classList.remove('dark', 'theme-light', 'theme-dreamy');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (theme === 'light') {
+        document.documentElement.classList.add('theme-light');
       }
-    });
-    
-    // Apply theme
-    document.documentElement.classList.remove('dark', 'theme-light', 'theme-dreamy');
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (theme === 'light') {
-      document.documentElement.classList.add('theme-light');
+
+      toast.success('Settings saved! 💾');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save settings');
     }
-    
-    toast.success('Settings saved! 💾');
   };
 
   const handleExportExpenses = () => {
@@ -189,6 +211,11 @@ const Settings = () => {
             <Button variant="destructive" onClick={handleReset}>
               Reset All Data
             </Button>
+            <div className="pt-2 border-t">
+              <Button variant="outline" onClick={() => { setAuthToken(null); navigate('/'); }}>
+                Logout
+              </Button>
+            </div>
           </div>
         </Card>
 
