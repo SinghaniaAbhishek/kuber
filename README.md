@@ -113,18 +113,18 @@ src/
  └── package.json
 
 🚀 Run Locally
-# Clone repo
-git clone https://github.com/yourusername/kuber.git
+Clone repo
+git clone https://github.com/SinghaniaAbhishek/kuber.git
 cd kuber
 
-# Install dependencies
+Install dependencies
 npm install
 
-# Start backend
+Start backend
 cd backend
 npm start
 
-# Start frontend
+Start frontend
 cd frontend
 npm run dev
 
