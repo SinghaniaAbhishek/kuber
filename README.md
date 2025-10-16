@@ -113,7 +113,11 @@ src/
  └── package.json
 
 🚀 Run Locally
+<<<<<<< HEAD
 Clone repo
+=======
+# Clone repo
+>>>>>>> dfe6984ae28227167f6f013b56fccf00c7db97a9
 git clone https://github.com/SinghaniaAbhishek/kuber.git
 cd kuber
 

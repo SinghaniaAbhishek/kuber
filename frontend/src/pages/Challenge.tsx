@@ -9,6 +9,7 @@ import { Plus, Trophy, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
+import api from '@/lib/api';
 
 const ChallengePage = () => {
   const { data, updateData } = useData();
@@ -19,24 +20,22 @@ const ChallengePage = () => {
     month: new Date().toISOString().slice(0, 7)
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const newChallenge: Challenge = {
-      id: `c${Date.now()}`,
-      name: formData.name,
-      limit: parseFloat(formData.limit),
-      month: formData.month,
-      progress: 0
-    };
-
-    updateData({
-      challenges: [...data.challenges, newChallenge]
-    });
-
-    toast.success('Challenge created! 🎯');
-    setIsOpen(false);
-    resetForm();
+    try {
+      const created = await api.create('challenges', {
+        name: formData.name,
+        limit: parseFloat(formData.limit),
+        month: formData.month,
+        progress: 0,
+      });
+      updateData({ challenges: [...data.challenges, created as Challenge] });
+      toast.success('Challenge created! 🎯');
+      setIsOpen(false);
+      resetForm();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to create challenge');
+    }
   };
 
   const resetForm = () => {

@@ -11,6 +11,7 @@ import { Plus, Edit, Trash2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { addMonths, addYears, format as formatDateFns } from 'date-fns';
 import Layout from '@/components/Layout';
+import api from '@/lib/api';
 
 const Bills = () => {
   const { data, updateData } = useData();
@@ -25,125 +26,69 @@ const Bills = () => {
     cycle: 'monthly'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (activeTab === 'bills') {
-      const newBill: Bill = {
-        id: editingId || `b${Date.now()}`,
-        name: formData.name,
-        amount: parseFloat(formData.amount),
-        dueDate: formData.date,
-        recurring: formData.recurring
-      };
-
-      if (editingId) {
-        updateData({
-          bills: data.bills.map(b => b.id === editingId ? newBill : b)
-        });
-        toast.success('Bill updated!');
+    try {
+      if (activeTab === 'bills') {
+        const payload = { name: formData.name, amount: parseFloat(formData.amount), dueDate: formData.date, recurring: formData.recurring };
+        if (editingId) {
+          const updated = await api.update('bills', editingId, payload);
+          updateData({ bills: data.bills.map(b => b.id === editingId ? updated as Bill : b) });
+          toast.success('Bill updated!');
+        } else {
+          const created = await api.create('bills', payload);
+          updateData({ bills: [...data.bills, created as Bill] });
+          toast.success('Bill added!');
+        }
       } else {
-        updateData({
-          bills: [...data.bills, newBill]
-        });
-        toast.success('Bill added!');
+        const payload = { name: formData.name, amount: parseFloat(formData.amount), nextDue: formData.date, cycle: formData.cycle };
+        if (editingId) {
+          const updated = await api.update('subscriptions', editingId, payload);
+          updateData({ subscriptions: data.subscriptions.map(s => s.id === editingId ? updated as Subscription : s) });
+          toast.success('Subscription updated!');
+        } else {
+          const created = await api.create('subscriptions', payload);
+          updateData({ subscriptions: [...data.subscriptions, created as Subscription] });
+          toast.success('Subscription added!');
+        }
       }
-    } else {
-      const newSub: Subscription = {
-        id: editingId || `s${Date.now()}`,
-        name: formData.name,
-        amount: parseFloat(formData.amount),
-        nextDue: formData.date,
-        cycle: formData.cycle
-      };
-
-      if (editingId) {
-        updateData({
-          subscriptions: data.subscriptions.map(s => s.id === editingId ? newSub : s)
-        });
-        toast.success('Subscription updated!');
-      } else {
-        updateData({
-          subscriptions: [...data.subscriptions, newSub]
-        });
-        toast.success('Subscription added!');
-      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save');
     }
 
     setIsOpen(false);
     resetForm();
   };
 
-  const handleMarkPaid = (id: string, type: 'bill' | 'subscription') => {
-    if (type === 'bill') {
-      const bill = data.bills.find(b => b.id === id);
-      if (!bill) return;
-
-      // Add expense entry
-      const newExpense: Expense = {
-        id: `e${Date.now()}`,
-        date: new Date().toISOString().split('T')[0],
-        amount: bill.amount,
-        category: 'Bills',
-        mode: 'Card',
-        note: `${bill.name} payment`
-      };
-
-      updateData({
-        expenses: [...data.expenses, newExpense],
-        bills: data.bills.map(b => {
-          if (b.id === id && b.recurring === 'monthly') {
-            const nextDate = addMonths(new Date(b.dueDate), 1);
-            return { ...b, dueDate: formatDateFns(nextDate, 'yyyy-MM-dd') };
-          }
-          return b;
-        })
-      });
-
-      toast.success('Bill marked as paid! 💚');
-    } else {
-      const sub = data.subscriptions.find(s => s.id === id);
-      if (!sub) return;
-
-      // Add expense entry
-      const newExpense: Expense = {
-        id: `e${Date.now()}`,
-        date: new Date().toISOString().split('T')[0],
-        amount: sub.amount,
-        category: 'Subscriptions',
-        mode: 'Card',
-        note: `${sub.name} subscription`
-      };
-
-      updateData({
-        expenses: [...data.expenses, newExpense],
-        subscriptions: data.subscriptions.map(s => {
-          if (s.id === id) {
-            let nextDate = new Date(s.nextDue);
-            if (s.cycle === 'monthly') nextDate = addMonths(nextDate, 1);
-            else if (s.cycle === 'quarterly') nextDate = addMonths(nextDate, 3);
-            else if (s.cycle === 'yearly') nextDate = addYears(nextDate, 1);
-            return { ...s, nextDue: formatDateFns(nextDate, 'yyyy-MM-dd') };
-          }
-          return s;
-        })
-      });
-
-      toast.success('Subscription payment recorded! 💚');
+  const handleMarkPaid = async (id: string, type: 'bill' | 'subscription') => {
+    try {
+      if (type === 'bill') {
+        const updated = await api.patch('bills', `/mark-paid/${id}`, { autoExpense: true });
+        updateData({ bills: data.bills.map(b => b.id === id ? updated as Bill : b) });
+        toast.success('Bill marked as paid! 💚');
+      } else {
+        const updated = await api.patch('subscriptions', `/mark-paid/${id}`, { autoExpense: true });
+        updateData({ subscriptions: data.subscriptions.map(s => s.id === id ? updated as Subscription : s) });
+        toast.success('Subscription payment recorded! 💚');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to mark paid');
     }
   };
 
-  const handleDelete = (id: string, type: 'bill' | 'subscription') => {
-    if (type === 'bill') {
-      updateData({
-        bills: data.bills.filter(b => b.id !== id)
-      });
-    } else {
-      updateData({
-        subscriptions: data.subscriptions.filter(s => s.id !== id)
-      });
+  const handleDelete = async (id: string, type: 'bill' | 'subscription') => {
+    try {
+      if (type === 'bill') {
+        await api.remove('bills', id);
+        updateData({ bills: data.bills.filter(b => b.id !== id) });
+      } else {
+        await api.remove('subscriptions', id);
+        updateData({ subscriptions: data.subscriptions.filter(s => s.id !== id) });
+      }
+      toast.success('Deleted successfully');
+    } catch (err: any) {
+      toast.error(err?.message || 'Delete failed');
     }
-    toast.success('Deleted successfully');
   };
 
   const resetForm = () => {

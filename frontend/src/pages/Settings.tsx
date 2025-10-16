@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/DataContext';
-import { exportToCSV } from '@/lib/utils/export';
+// export handled via backend CSV endpoint
 import { toast } from 'sonner';
 import { Download, RefreshCw, Moon, Sun, Palette } from 'lucide-react';
 import Layout from '@/components/Layout';
@@ -56,44 +56,59 @@ const Settings = () => {
     }
   };
 
-  const handleExportExpenses = () => {
-    const exportData = data.expenses.map(e => ({
-      Date: e.date,
-      Amount: e.amount,
-      Category: e.category,
-      Mode: e.mode,
-      Note: e.note
-    }));
-    exportToCSV(exportData, 'expenses');
-    toast.success('Expenses exported to CSV!');
+  const downloadCsv = (filename: string, csv: string) => {
+    try {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${filename}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Fallback: data URL
+      const url = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${filename}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
-  const handleExportGoals = () => {
-    const exportData = data.goals.map(g => ({
-      Name: g.name,
-      Target: g.target,
-      Saved: g.saved,
-      Progress: `${((g.saved / g.target) * 100).toFixed(1)}%`
-    }));
-    exportToCSV(exportData, 'savings-goals');
-    toast.success('Goals exported to CSV!');
+  const handleExportExpenses = async () => {
+    try {
+      const csv = await api.exportCsv();
+      if (csv && typeof csv.expenses === 'string') downloadCsv('expenses', csv.expenses);
+      toast.success('Expenses exported to CSV!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to export');
+    }
   };
 
-  const handleExportBills = () => {
-    const billsData = data.bills.map(b => ({
-      Name: b.name,
-      Amount: b.amount,
-      DueDate: b.dueDate,
-      Recurring: b.recurring
-    }));
-    const subsData = data.subscriptions.map(s => ({
-      Name: s.name,
-      Amount: s.amount,
-      NextDue: s.nextDue,
-      Cycle: s.cycle
-    }));
-    exportToCSV([...billsData, ...subsData], 'bills-subscriptions');
-    toast.success('Bills exported to CSV!');
+  const handleExportGoals = async () => {
+    try {
+      const csv = await api.exportCsv();
+      if (csv && typeof csv.goals === 'string') downloadCsv('savings-goals', csv.goals);
+      toast.success('Goals exported to CSV!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to export');
+    }
+  };
+
+  const handleExportBills = async () => {
+    try {
+      const csv = await api.exportCsv();
+      // Offer both bills and subscriptions separately
+      if (csv && typeof csv.bills === 'string') downloadCsv('bills', csv.bills);
+      if (csv && typeof csv.subscriptions === 'string') downloadCsv('subscriptions', csv.subscriptions);
+      toast.success('Bills & Subscriptions exported to CSV!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to export');
+    }
   };
 
   const handleReset = () => {

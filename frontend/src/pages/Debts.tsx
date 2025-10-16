@@ -10,6 +10,7 @@ import { formatCurrency, formatDate } from '@/lib/utils/format';
 import { Plus, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Layout from '@/components/Layout';
+import api from '@/lib/api';
 
 const Debts = () => {
   const { data, updateData } = useData();
@@ -22,39 +23,43 @@ const Debts = () => {
     note: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const newDebt: Debt = {
-      id: `d${Date.now()}`,
-      name: formData.name,
-      amount: parseFloat(formData.amount),
-      type: activeTab,
-      due: formData.due,
-      note: formData.note
-    };
-
-    updateData({
-      debts: [...data.debts, newDebt]
-    });
-
-    toast.success('Debt recorded!');
-    setIsOpen(false);
-    resetForm();
+    try {
+      const created = await api.create('debts', {
+        name: formData.name,
+        amount: parseFloat(formData.amount),
+        type: activeTab,
+        due: formData.due,
+        note: formData.note,
+      });
+      updateData({ debts: [...data.debts, created as Debt] });
+      toast.success('Debt recorded!');
+      setIsOpen(false);
+      resetForm();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to add');
+    }
   };
 
-  const handleMarkPaid = (id: string) => {
-    updateData({
-      debts: data.debts.filter(d => d.id !== id)
-    });
-    toast.success('Marked as paid! 💚');
+  const handleMarkPaid = async (id: string) => {
+    try {
+      await api.patch('debts', `/mark-paid/${id}`);
+      updateData({ debts: data.debts.filter(d => d.id !== id) });
+      toast.success('Marked as paid! 💚');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to mark paid');
+    }
   };
 
-  const handleDelete = (id: string) => {
-    updateData({
-      debts: data.debts.filter(d => d.id !== id)
-    });
-    toast.success('Deleted');
+  const handleDelete = async (id: string) => {
+    try {
+      await api.remove('debts', id);
+      updateData({ debts: data.debts.filter(d => d.id !== id) });
+      toast.success('Deleted');
+    } catch (err: any) {
+      toast.error(err?.message || 'Delete failed');
+    }
   };
 
   const resetForm = () => {
