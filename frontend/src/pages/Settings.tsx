@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/DataContext';
 // export handled via backend CSV endpoint
@@ -11,12 +12,16 @@ import Layout from '@/components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { setAuthToken } from '@/lib/api';
 import api from '@/lib/api';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 
 const Settings = () => {
   const { data, updateData, resetData } = useData();
   const navigate = useNavigate();
   const [theme, setTheme] = useState(data.settings.theme);
   const [monthlyBudget, setMonthlyBudget] = useState(data.settings.monthlyBudget.toString());
+  const [incOpen, setIncOpen] = useState(false);
+  const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
+  const [incomeForm, setIncomeForm] = useState({ source: '', amount: '', date: new Date().toISOString().split('T')[0] });
 
   useEffect(() => {
     // Ensure latest user info is fetched from backend for About/Account section
@@ -53,6 +58,41 @@ const Settings = () => {
       toast.success('Settings saved! 💾');
     } catch (e: any) {
       toast.error(e?.message || 'Failed to save settings');
+    }
+  };
+
+  const resetIncomeForm = () => {
+    setEditingIncomeId(null);
+    setIncomeForm({ source: '', amount: '', date: new Date().toISOString().split('T')[0] });
+  };
+
+  const handleIncomeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = { source: incomeForm.source, amount: parseFloat(incomeForm.amount), date: incomeForm.date };
+    try {
+      if (editingIncomeId) {
+        const updated = await api.update('income', editingIncomeId, payload);
+        updateData({ income: data.income.map(i => i.id === editingIncomeId ? updated as any : i) });
+        toast.success('Income updated');
+      } else {
+        const created = await api.create('income', payload);
+        updateData({ income: [...data.income, created as any] });
+        toast.success('Income added');
+      }
+      setIncOpen(false);
+      resetIncomeForm();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save income');
+    }
+  };
+
+  const handleIncomeDelete = async (id: string) => {
+    try {
+      await api.remove('income', id);
+      updateData({ income: data.income.filter(i => i.id !== id) });
+      toast.success('Income deleted');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to delete');
     }
   };
 
@@ -183,6 +223,82 @@ const Settings = () => {
             <Button onClick={handleSaveSettings}>
               Save Settings
             </Button>
+          </div>
+        </Card>
+
+        {/* Income Management */}
+        <Card className="p-6 glass-card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Income</h2>
+            <Dialog open={incOpen} onOpenChange={(o) => { setIncOpen(o); if (!o) resetIncomeForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Income
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{editingIncomeId ? 'Edit Income' : 'Add Income'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleIncomeSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Source</label>
+                    <Input
+                      placeholder="e.g., Salary, Freelance"
+                      value={incomeForm.source}
+                      onChange={(e) => setIncomeForm({ ...incomeForm, source: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Amount</label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={incomeForm.amount}
+                      onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Date</label>
+                    <Input
+                      type="date"
+                      value={incomeForm.date}
+                      onChange={(e) => setIncomeForm({ ...incomeForm, date: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">{editingIncomeId ? 'Update' : 'Add'} Income</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="space-y-3">
+            {data.income.length === 0 && (
+              <p className="text-sm text-muted-foreground">No income added yet.</p>
+            )}
+            {data.income
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((inc) => (
+                <div key={inc.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div>
+                    <p className="font-medium">{inc.source}</p>
+                    <p className="text-xs text-muted-foreground">{inc.date}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="font-semibold">{inc.amount}</p>
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingIncomeId(inc.id); setIncomeForm({ source: inc.source, amount: String(inc.amount), date: inc.date }); setIncOpen(true); }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleIncomeDelete(inc.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
           </div>
         </Card>
 
