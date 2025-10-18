@@ -172,7 +172,7 @@ const FinanceChatbot = () => {
               </ScrollArea>
 
               {/* Suggestions */}
-              {messages.length === 1 && (
+              {(messages.length === 1 || (messages.length > 1 && messages[messages.length - 1].role === 'assistant' && !isLoading)) && (
                 <div className="px-4 pb-2">
                   <p className="text-xs text-muted-foreground mb-2">Try asking:</p>
                   <div className="flex flex-wrap gap-2">
