@@ -7,27 +7,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useData } from '@/contexts/DataContext';
 // export handled via backend CSV endpoint
 import { toast } from 'sonner';
-import { Download, RefreshCw, Moon, Sun, Palette } from 'lucide-react';
+import { Download, RefreshCw, Moon, Sun, Palette, Monitor, Settings as SettingsIcon } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { setAuthToken } from '@/lib/api';
 import api from '@/lib/api';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
+import FeatureHero from '@/components/FeatureHero';
 
 const Settings = () => {
   const { data, updateData, resetData } = useData();
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(data.settings.theme);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [monthlyBudget, setMonthlyBudget] = useState(data.settings.monthlyBudget.toString());
   const [incOpen, setIncOpen] = useState(false);
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
   const [incomeForm, setIncomeForm] = useState({ source: '', amount: '', date: new Date().toISOString().split('T')[0] });
 
   useEffect(() => {
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
+    setTheme(savedTheme);
+    
     // Ensure latest user info is fetched from backend for About/Account section
     (async () => {
       try {
-        const me = await api.me();
+        const me = await api.me() as any;
         if (me && (me.name !== data.user.name || me.email !== data.user.email)) {
           updateData({ user: me });
         }
@@ -35,25 +41,24 @@ const Settings = () => {
     })();
   }, []);
 
+  const handleThemeChange = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    const root = document.documentElement;
+    root.classList.remove('dark', 'theme-light');
+    root.classList.toggle('dark', newTheme === 'dark');
+  };
+
   const handleSaveSettings = async () => {
     try {
-      await api.setTheme(theme);
       await api.setBudget(parseFloat(monthlyBudget), data.settings.currency);
       updateData({
         settings: {
           ...data.settings,
-          theme,
           monthlyBudget: parseFloat(monthlyBudget)
         }
       });
-
-      // Apply theme
-      document.documentElement.classList.remove('dark', 'theme-light', 'theme-dreamy');
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else if (theme === 'light') {
-        document.documentElement.classList.add('theme-light');
-      }
 
       toast.success('Settings saved! 💾');
     } catch (e: any) {
@@ -121,7 +126,7 @@ const Settings = () => {
 
   const handleExportExpenses = async () => {
     try {
-      const csv = await api.exportCsv();
+      const csv = await api.exportCsv() as any;
       if (csv && typeof csv.expenses === 'string') downloadCsv('expenses', csv.expenses);
       toast.success('Expenses exported to CSV!');
     } catch (e: any) {
@@ -131,7 +136,7 @@ const Settings = () => {
 
   const handleExportGoals = async () => {
     try {
-      const csv = await api.exportCsv();
+      const csv = await api.exportCsv() as any;
       if (csv && typeof csv.goals === 'string') downloadCsv('savings-goals', csv.goals);
       toast.success('Goals exported to CSV!');
     } catch (e: any) {
@@ -141,7 +146,7 @@ const Settings = () => {
 
   const handleExportBills = async () => {
     try {
-      const csv = await api.exportCsv();
+      const csv = await api.exportCsv() as any;
       // Offer both bills and subscriptions separately
       if (csv && typeof csv.bills === 'string') downloadCsv('bills', csv.bills);
       if (csv && typeof csv.subscriptions === 'string') downloadCsv('subscriptions', csv.subscriptions);
@@ -161,10 +166,14 @@ const Settings = () => {
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in max-w-4xl">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Customize your experience</p>
-        </div>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Settings"
+          description="Customize your experience"
+          icon={<SettingsIcon className="h-12 w-12" />}
+          gradientFrom="primary"
+          gradientTo="secondary"
+        />
 
         {/* Appearance */}
         <Card className="p-6 glass-card">
@@ -175,17 +184,11 @@ const Settings = () => {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Theme</label>
-              <Select value={theme} onValueChange={setTheme}>
+              <Select value={theme} onValueChange={handleThemeChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dreamy">
-                    <div className="flex items-center gap-2">
-                      <Palette className="h-4 w-4" />
-                      Dreamy (Pastel)
-                    </div>
-                  </SelectItem>
                   <SelectItem value="light">
                     <div className="flex items-center gap-2">
                       <Sun className="h-4 w-4" />
@@ -200,6 +203,13 @@ const Settings = () => {
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div>
+                <p className="font-medium">Quick Theme Toggle</p>
+                <p className="text-sm text-muted-foreground">Switch themes instantly</p>
+              </div>
+              <ThemeToggle />
             </div>
           </div>
         </Card>

@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { useData } from '@/contexts/DataContext';
 import { formatCurrency, getDaysUntil } from '@/lib/utils/format';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { Plus, TrendingUp, TrendingDown, Wallet, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, AlertCircle, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 
 const Dashboard = () => {
   const { data } = useData();
@@ -42,19 +43,14 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Your financial overview at a glance</p>
-          </div>
-          <div className="flex gap-2">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Expense
-            </Button>
-          </div>
-        </div>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Dashboard"
+          description="Your financial overview at a glance"
+          icon={<BarChart3 className="h-12 w-12" />}
+          gradientFrom="primary"
+          gradientTo="accent"
+        />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

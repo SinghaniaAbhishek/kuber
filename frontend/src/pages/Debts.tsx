@@ -7,9 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useData, Debt } from '@/contexts/DataContext';
 import { formatCurrency, formatDate } from '@/lib/utils/format';
-import { Plus, CheckCircle, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle, Trash2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 import api from '@/lib/api';
 
 const Debts = () => {
@@ -77,21 +78,28 @@ const Debts = () => {
   const totalIOwe = iOweDebts.reduce((sum, d) => sum + d.amount, 0);
   const totalOwedToMe = owedToMeDebts.reduce((sum, d) => sum + d.amount, 0);
 
+  const totalDebts = data.debts.reduce((sum, debt) => sum + debt.amount, 0);
+
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Debt & Split Tracker</h1>
-            <p className="text-muted-foreground">Keep track of money borrowed and lent</p>
-          </div>
-          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Entry
-              </Button>
-            </DialogTrigger>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Debt & Split Tracker"
+          description="Keep track of money borrowed and lent"
+          icon={<FileText className="h-12 w-12" />}
+          value={formatCurrency(totalDebts, data.settings.currency)}
+          valueLabel="Total Debt"
+          gradientFrom="warning"
+          gradientTo="destructive"
+          actionButton={
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Entry
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Debt Entry</DialogTitle>
@@ -147,7 +155,8 @@ const Debts = () => {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-2 gap-4">

@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData, Expense } from '@/contexts/DataContext';
 import { formatCurrency, formatDate } from '@/lib/utils/format';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
+import AddExpenseDialog from '@/components/AddExpenseDialog';
+import FeatureHero from '@/components/FeatureHero';
 import api from '@/lib/api';
 
 const Expenses = () => {
@@ -92,88 +95,92 @@ const Expenses = () => {
   };
 
   const totalExpense = data.expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const today = new Date().toISOString().split('T')[0];
+  const todayExpense = data.expenses
+    .filter(exp => exp.date === today)
+    .reduce((sum, exp) => sum + exp.amount, 0);
   const budgetProgress = (totalExpense / data.settings.monthlyBudget) * 100;
 
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Expense Tracker</h1>
-            <p className="text-muted-foreground">Manage all your expenses</p>
-          </div>
-          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Expense
+        {/* Hero Header */}
+        <FeatureHero
+          title="Expense Tracker"
+          description="Manage all your expenses with precision"
+          icon={<TrendingDown className="h-12 w-12" />}
+          value={formatCurrency(todayExpense, data.settings.currency)}
+          valueLabel="Today's Spending"
+          gradientFrom="destructive"
+          gradientTo="primary"
+          actionButton={<AddExpenseDialog />}
+        />
+
+        <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingId ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Date</label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Amount</label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Category</label>
+                <Select value={formData.category} onValueChange={(val) => setFormData({ ...formData, category: val })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(cat => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Payment Mode</label>
+                <Select value={formData.mode} onValueChange={(val) => setFormData({ ...formData, mode: val })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {modes.map(mode => (
+                      <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Note</label>
+                <Input
+                  placeholder="Add a note..."
+                  value={formData.note}
+                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                {editingId ? 'Update' : 'Add'} Expense
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingId ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Date</label>
-                  <Input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Amount</label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Category</label>
-                  <Select value={formData.category} onValueChange={(val) => setFormData({ ...formData, category: val })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Payment Mode</label>
-                  <Select value={formData.mode} onValueChange={(val) => setFormData({ ...formData, mode: val })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {modes.map(mode => (
-                        <SelectItem key={mode} value={mode}>{mode}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Note</label>
-                  <Input
-                    placeholder="Add a note..."
-                    value={formData.note}
-                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  {editingId ? 'Update' : 'Add'} Expense
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         {/* Budget Progress */}
         <Card className="p-6 glass-card">

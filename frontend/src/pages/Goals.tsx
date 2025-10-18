@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useData, Goal } from '@/contexts/DataContext';
 import { formatCurrency, getProgressPercentage } from '@/lib/utils/format';
-import { Plus, Edit, Trash2, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, DollarSign, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 import api from '@/lib/api';
 
 const Goals = () => {
@@ -119,21 +120,29 @@ const Goals = () => {
     setFormData({ name: '', target: '', saved: '0' });
   };
 
+  const totalSaved = data.goals.reduce((sum, goal) => sum + goal.saved, 0);
+  const totalTarget = data.goals.reduce((sum, goal) => sum + goal.target, 0);
+
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Savings Goals</h1>
-            <p className="text-muted-foreground">Track your dreams and achieve them 🎯</p>
-          </div>
-          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Goal
-              </Button>
-            </DialogTrigger>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Savings Goals"
+          description="Track your dreams and achieve them 🎯"
+          icon={<Target className="h-12 w-12" />}
+          value={formatCurrency(totalSaved, data.settings.currency)}
+          valueLabel="Total Saved"
+          gradientFrom="success"
+          gradientTo="accent"
+          actionButton={
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button variant="gradient" className="hover:shadow-lg transition-all duration-300">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Goal
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{editingId ? 'Edit Goal' : 'Create New Goal'}</DialogTitle>
@@ -173,7 +182,8 @@ const Goals = () => {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         {/* Goals Grid */}
         <div className="grid md:grid-cols-2 gap-6">

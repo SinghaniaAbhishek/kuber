@@ -2,9 +2,10 @@ import { Card } from '@/components/ui/card';
 import { useData } from '@/contexts/DataContext';
 import { formatCurrency } from '@/lib/utils/format';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 
 const Insights = () => {
   const { data } = useData();
@@ -66,10 +67,16 @@ const Insights = () => {
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div>
-          <h1 className="text-3xl font-bold">Insights</h1>
-          <p className="text-muted-foreground">Data-driven view of your finances</p>
-        </div>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Insights"
+          description="Data-driven view of your finances"
+          icon={<BarChart3 className="h-12 w-12" />}
+          value={formatCurrency(currentMonthIncome - currentMonthExpenses, data.settings.currency)}
+          valueLabel="Net Savings"
+          gradientFrom="accent"
+          gradientTo="success"
+        />
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useData, Bill, Subscription, Expense } from '@/contexts/DataContext';
 import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils/format';
-import { Plus, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { addMonths, addYears, format as formatDateFns } from 'date-fns';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 import api from '@/lib/api';
 
 const Bills = () => {
@@ -102,21 +103,29 @@ const Bills = () => {
     });
   };
 
+  const totalBills = data.bills.reduce((sum, bill) => sum + bill.amount, 0);
+  const totalSubscriptions = data.subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Bills & Subscriptions</h1>
-            <p className="text-muted-foreground">Never miss a payment</p>
-          </div>
-          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add {activeTab === 'bills' ? 'Bill' : 'Subscription'}
-              </Button>
-            </DialogTrigger>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Bills & Subscriptions"
+          description="Never miss a payment"
+          icon={<CreditCard className="h-12 w-12" />}
+          value={formatCurrency(totalBills + totalSubscriptions, data.settings.currency)}
+          valueLabel="Total Monthly"
+          gradientFrom="warning"
+          gradientTo="secondary"
+          actionButton={
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add {activeTab === 'bills' ? 'Bill' : 'Subscription'}
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add {activeTab === 'bills' ? 'Bill' : 'Subscription'}</DialogTitle>
@@ -186,7 +195,8 @@ const Bills = () => {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">

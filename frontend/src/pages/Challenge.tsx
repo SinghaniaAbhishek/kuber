@@ -9,6 +9,7 @@ import { Plus, Trophy, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
+import FeatureHero from '@/components/FeatureHero';
 import api from '@/lib/api';
 
 const ChallengePage = () => {
@@ -58,21 +59,29 @@ const ChallengePage = () => {
     return { ...challenge, actualProgress: monthExpenses, progress, isSuccess };
   });
 
+  const totalChallenges = data.challenges.length;
+  const completedChallenges = challengesWithProgress.filter(c => c.progress >= 100).length;
+
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Budget Challenge</h1>
-            <p className="text-muted-foreground">Set monthly limits and track your progress 🎯</p>
-          </div>
-          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Challenge
-              </Button>
-            </DialogTrigger>
+        {/* Hero Header */}
+        <FeatureHero
+          title="Budget Challenge"
+          description="Set monthly limits and track your progress 🎯"
+          icon={<Trophy className="h-12 w-12" />}
+          value={`${completedChallenges}/${totalChallenges}`}
+          valueLabel="Completed"
+          gradientFrom="warning"
+          gradientTo="success"
+          actionButton={
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Challenge
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create Budget Challenge</DialogTitle>
@@ -112,7 +121,8 @@ const ChallengePage = () => {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         {/* Badges Section */}
         <Card className="p-6 glass-card">
