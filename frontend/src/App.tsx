@@ -16,10 +16,20 @@ import Settings from "./pages/Settings";
 
 import FinanceChatbot from "./components/FinanceChatbot";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  // Initialize theme to light mode on app start
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
+    const root = document.documentElement;
+    root.classList.remove('dark');
+    root.classList.toggle('dark', savedTheme === 'dark');
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -44,6 +54,7 @@ const App = () => (
       </DataProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

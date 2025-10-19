@@ -11,7 +11,13 @@ const withUser = (fields) =>
 
 export const Settings = mongoose.model(
   'Settings',
-  withUser({ theme: String, currency: String, monthlyBudget: Number })
+  withUser({ 
+    theme: String, 
+    currency: String, 
+    monthlyBudget: Number,
+    emailReminders: { type: Boolean, default: true },
+    reminderTime: { type: String, default: '09:00' }
+  })
 );
 
 export const Income = mongoose.model(

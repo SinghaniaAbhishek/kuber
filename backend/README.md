@@ -16,6 +16,11 @@ npm install
 MONGO_URI=
 JWT_SECRET=devsecret
 PORT=5000
+
+# Email Configuration (for reminders)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+FRONTEND_URL=http://localhost:3000
 ```
 
 3. Run in development:
@@ -58,6 +63,7 @@ Core Resources
 - `/api/insights/income-vs-expense`, `/api/insights/activity`
 - `/api/settings/theme` GET/PUT, `/api/settings/budget` GET/PUT, `/api/settings/reset-data` POST, `/api/settings/export` GET
 - `/api/assistant/summary` POST
+- `/api/reminders/send-reminders` POST (manual trigger for testing)
 
 Frontend Connection
 -------------------

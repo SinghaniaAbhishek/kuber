@@ -1,9 +1,9 @@
 {
-  "name": "personal-finance-simplifier-backend", 
-  "version": "1.0.0", 
-  "private": true, 
-  "type": "module", 
-  "main": "server.js", 
+  "name": "personal-finance-simplifier-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
@@ -17,6 +17,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.0",
     "morgan": "^1.10.0",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.9",
     "papaparse": "^5.4.1",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"

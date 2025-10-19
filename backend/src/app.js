@@ -17,6 +17,7 @@ import insightsRoutes from './routes/insights.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import badgesRoutes from './routes/badges.routes.js';
 import assistantRoutes from './routes/assistant.routes.js';
+import remindersRoutes from './routes/reminders.routes.js';
 import swaggerUi from 'swagger-ui-express';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -46,6 +47,7 @@ app.use('/api/insights', insightsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/badges', badgesRoutes);
 app.use('/api/assistant', assistantRoutes);
+app.use('/api/reminders', remindersRoutes);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 app.use(errorHandler);

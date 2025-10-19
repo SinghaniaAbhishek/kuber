@@ -60,6 +60,28 @@ router.post('/reset-data', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+router.get('/email-reminders', async (req, res, next) => {
+  try {
+    const s = await Settings.findOne({ userId: req.user.id });
+    res.json({ 
+      emailReminders: s?.emailReminders ?? true, 
+      reminderTime: s?.reminderTime ?? '09:00' 
+    });
+  } catch (e) { next(e); }
+});
+
+router.put('/email-reminders', async (req, res, next) => {
+  try {
+    const { emailReminders, reminderTime } = req.body;
+    const s = await Settings.findOneAndUpdate(
+      { userId: req.user.id },
+      { $set: { emailReminders, reminderTime } },
+      { new: true, upsert: true }
+    );
+    res.json(s);
+  } catch (e) { next(e); }
+});
+
 router.get('/export', async (req, res, next) => {
   try {
     const [income, expenses, goals, bills, subscriptions, debts, challenges, badges] = await Promise.all([

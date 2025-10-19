@@ -21,6 +21,8 @@ const Settings = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [monthlyBudget, setMonthlyBudget] = useState(data.settings.monthlyBudget.toString());
+  const [emailReminders, setEmailReminders] = useState(true);
+  const [reminderTime, setReminderTime] = useState('09:00');
   const [incOpen, setIncOpen] = useState(false);
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
   const [incomeForm, setIncomeForm] = useState({ source: '', amount: '', date: new Date().toISOString().split('T')[0] });
@@ -29,6 +31,15 @@ const Settings = () => {
     // Load saved theme
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
     setTheme(savedTheme);
+    
+    // Load email reminder settings
+    (async () => {
+      try {
+        const emailSettings = await api.getEmailReminders() as any;
+        setEmailReminders(emailSettings.emailReminders);
+        setReminderTime(emailSettings.reminderTime);
+      } catch {}
+    })();
     
     // Ensure latest user info is fetched from backend for About/Account section
     (async () => {
@@ -63,6 +74,15 @@ const Settings = () => {
       toast.success('Settings saved! 💾');
     } catch (e: any) {
       toast.error(e?.message || 'Failed to save settings');
+    }
+  };
+
+  const handleSaveEmailSettings = async () => {
+    try {
+      await api.setEmailReminders(emailReminders, reminderTime);
+      toast.success('Email reminder settings saved! 📧');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save email settings');
     }
   };
 
@@ -232,6 +252,48 @@ const Settings = () => {
             </div>
             <Button onClick={handleSaveSettings}>
               Save Settings
+            </Button>
+          </div>
+        </Card>
+
+        {/* Email Reminders */}
+        <Card className="p-6 glass-card">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <SettingsIcon className="h-5 w-5" />
+            Email Reminders
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div>
+                <p className="font-medium">Enable Email Reminders</p>
+                <p className="text-sm text-muted-foreground">Get notified about due bills, subscriptions, and debts</p>
+              </div>
+              <Button
+                variant={emailReminders ? "default" : "outline"}
+                onClick={() => setEmailReminders(!emailReminders)}
+                className="min-w-[80px]"
+              >
+                {emailReminders ? "Enabled" : "Disabled"}
+              </Button>
+            </div>
+            
+            {emailReminders && (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Reminder Time</label>
+                <Input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => setReminderTime(e.target.value)}
+                  className="max-w-[200px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Daily reminders will be sent at this time for payments due today
+                </p>
+              </div>
+            )}
+            
+            <Button onClick={handleSaveEmailSettings} disabled={!emailReminders}>
+              Save Email Settings
             </Button>
           </div>
         </Card>

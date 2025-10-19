@@ -9,6 +9,11 @@ const ThemeToggle = () => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
     setTheme(savedTheme);
     applyTheme(savedTheme);
+    
+    // Ensure the document starts with light theme if no saved theme
+    if (!localStorage.getItem('theme')) {
+      localStorage.setItem('theme', 'light');
+    }
   }, []);
 
   const applyTheme = (newTheme: 'light' | 'dark') => {
