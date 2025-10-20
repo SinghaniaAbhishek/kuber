@@ -1,106 +1,184 @@
-💰 KUBER — Personal Finance Simplifier
+💰 KUBER – Personal Finance Simplifier
 
 “Master your money, don’t let it master you.” — Team Kuber 💚
 
-A pastel-themed, gamified, and visually delightful personal finance web app built to make money management simple, beautiful, and stress-free.
+A pastel-themed, gamified personal finance web app that turns anxiety into clarity.
+Kuber helps users track, visualize, and celebrate their financial journey — all in one interactive dashboard.
 
-Kuber empowers users to track, visualize, and celebrate their financial progress with an elegant dashboard and intuitive tools.
+🌍 Overview
 
-🧭 Overview
+Kuber simplifies money management through an elegant UI, goal tracking, reminders, and smart insights — empowering young professionals and freelancers to build healthy financial habits.
 
-Managing money shouldn't be anxiety-inducing — it should feel rewarding.
-KUBER helps users build healthier financial habits with features like expense tracking, savings goals, bill reminders, insights, and an on-page AI Assistant — all wrapped in a pastel, glassmorphic UI that radiates calm and confidence.
+✨ Core Features
+💸 Expense, Income & Budget Tracking
 
-✨ Key Features
-💸 Smart Expense & Budget Tracking
+CRUD for income & expense
 
-  Categorize and manage income and expenses
-  Dynamic budget bar (turns yellow/red as limit nears)
-  Clean visual summaries with pie & line charts
+Category-based visualization (Food, Travel, Rent, etc.)
 
-🎯 Savings Goal Visualizer
+Budget progress bar updates live
 
-  Set financial goals and track progress visually
-  Progress animations with confetti celebrations 🎉
-  Unlockable badges for achievements
+🎯 Savings Goals
 
-📅 Bills & Subscriptions
+Create multiple goals (e.g., “Laptop Fund,” “Trip to Goa”)
 
-  Bill tracker with due date countdown
-  Mark Paid → updates expense + advances due date
-  Gentle color coded reminders
+Add savings → progress ring animation
 
-🤝 Debt & Split Tracker
+🎉 Confetti + badges on completion
 
-  Tabs for “I Owe” and “Owed to Me”
-  Simple settlement flows and optional sync with expenses
+📅 Bill & Subscription Reminders
 
-📊 Insights & Reports
+Auto alerts for upcoming bills
 
-  6-month trend charts (Income vs Expense)
-  Category-wise heatmap visualization
-  Animated counters for totals and comparisons
+“Mark Paid” adds expense automatically
 
-🧩 Budget Challenges
+Smart recurring bill system
 
-  Create monthly saving/spending challenges
-  Live circular progress tracke
-  Achievement badges: Smart Saver, Goal Getter, Bill Ninja 🏅
+💬 AI Finance Assistant (Offline)
 
-🤖 AI Assistant (On-Page) — NEW & IMPROVED
+“Summarize my finances for this month.”
+“Show me pending bills.”
+“How much did I save this quarter?”
 
-  Kuber includes a friendly AI Assistant that summarizes your finances, answers natural-language queries, and surfaces quick actions — designed to be helpful, private, and judge-friendly.
+Works 100% offline (reads from local or MongoDB data)
 
-  Capabilities (sample queries):
+Summarizes your income, spending, and goals in seconds
 
-    “Summarize my finances for Oct 2025.”
-    “Show upcoming bills in the next 7 days.”
-    “How much did I spend on subscriptions this month?”
-    “Which goal is closest to completion?”
+No external API needed — pure local summarizer logic
 
-⚙️ Tech Stack
-  🧩 Frontend
-    Layer	Tech Used
-    Framework	React (Vite + Hooks + Context API)
-    Styling	Tailwind CSS (glassmorphic + pastel theme)
-    Animations	Framer Motion
-    Charts	Recharts
-    Utilities	date-fns, papaparse
-    TDeployment Vercel
-  🧠 Backend
-    Layer	Tech Used
-    Framework	Node.js + Express
-    Database	MongoDB (Mongoose ORM)
-    API Auth	JWT (JSON Web Token)
-    Scheduler	node-cron (for reminders)
-    AI Summarizer	Local summarizer logic using data aggregation
-    File Handling	Multer (for CSV import/export)
-    Deployment	Railway (backend)
+📊 Insights Dashboard
 
+6-month trendline for Income vs Expense
+
+Category pie chart
+
+Spending activity heatmap
+
+💪 Budget Challenge Mode
+
+Create self-challenges (e.g., “Spend under ₹5,000 this month”)
+
+Visual tracker + badges for success
+
+⚙ Settings
+
+Light 🌞 / Dark 🌙 / Dreamy 💫 themes
+
+Export CSVs for expense, goals, and bills
+
+Reset to mock data anytime
+
+⚙ Tech Stack
+🧩 Frontend
+Layer	Tech Used
+Framework	React (Vite + Hooks + Context API)
+Styling	Tailwind CSS (Glassmorphic Pastel Theme)
+Animations	Framer Motion
+Charts	Recharts
+Utilities	date-fns, papaparse
+State Management	Context API
+Persistence	localStorage + MongoDB sync
+Testing	React Testing Library (optional)
+🧠 Backend
+Layer	Tech Used
+Framework	Node.js + Express
+Database	MongoDB (via Mongoose ORM)
+Authentication	JWT
+Scheduler	node-cron (Bill Reminder Jobs)
+File Handling	Multer (CSV Import/Export)
+AI Summarizer	Local data aggregation engine
+Deployment	Render / Railway / Vercel
 🧱 System Architecture
-  Frontend (React + Tailwind)
-      ↓ REST API (Axios)
-  Backend (Node + Express)
-      ↓
-  MongoDB (Atlas / Local)
+        ┌───────────────────────────────┐
+        │           Frontend            │
+        │  React + Tailwind + Recharts  │
+        │  (Dashboard, Charts, Goals)   │
+        └──────────────┬────────────────┘
+                       │  Axios REST API
+                       ▼
+        ┌───────────────────────────────┐
+        │            Backend            │
+        │    Node.js + Express APIs     │
+        │   /expenses /bills /goals     │
+        │   /ai/summarize               │
+        └──────────────┬────────────────┘
+                       │  Mongoose
+                       ▼
+        ┌───────────────────────────────┐
+        │           MongoDB             │
+        │  Data: Expenses, Goals, Bills │
+        │  AI reads for summaries       │
+        └───────────────────────────────┘
+
+🧩 AI Summarizer Logic
+Input:
+
+Pulls data from user’s income, expenses, goals & bills.
+
+Processing:
+
+Aggregates totals → detects upcoming bills → computes savings ratio.
+
+Output:
+
+Generates a structured natural summary:
+
+📅 Monthly Snapshot — Oct 2025
+💰 Income: ₹30,000
+💸 Expenses: ₹6,950
+💵 Net Savings: ₹23,050
+🎯 Goals: Trip Fund 70% | Laptop 45%
+📅 Bills: Netflix ₹499 (2 days), Rent ₹4,000 (5 days)
+🏆 Challenge “Under ₹7000 Oct” — 92% completed!
+
+🧾 Sample Mock Data
+// src/data/mock.js
+export const MOCK_DATA = {
+  income: [
+    { id: 1, source: "Freelance", amount: 15000, date: "2025-10-02" },
+    { id: 2, source: "Part-time Job", amount: 12000, date: "2025-10-05" }
+  ],
+  expenses: [
+    { id: 1, category: "Food", title: "Zomato", amount: 450, date: "2025-10-03" },
+    { id: 2, category: "Bills", title: "Electricity", amount: 1800, date: "2025-10-07" }
+  ],
+  goals: [
+    { id: 1, name: "Trip to Goa", target: 10000, saved: 7500 },
+    { id: 2, name: "Laptop", target: 40000, saved: 10000 }
+  ],
+  bills: [
+    { id: 1, name: "Netflix", amount: 499, due: "2025-10-18" },
+    { id: 2, name: "WiFi", amount: 699, due: "2025-10-20" }
+  ],
+  challenges: [
+    { id: 1, title: "Under ₹7000", limit: 7000, spent: 6450 }
+  ]
+};
+
+🚀 Run Locally
+# Clone repo
+git clone https://github.com/yourusername/kuber.git
+cd kuber
+
+# Install dependencies
+npm install
+
+# Run backend
+cd backend
+npm start
+
+# Run frontend
+cd frontend
+npm run dev
 
 
-🧠 AI Summarizer Logic
+🪄 Open 👉 http://localhost:5173
 
-  Reads from user’s financial data (income, expenses, goals, bills)
-  Aggregates totals, identifies upcoming bills, and detects trends
-  Generates structured natural text summaries
-
-
-🗂️ Project Structure
+🧩 App Structure
 src/
  ├── backend/
  │    ├── server.js
  │    ├── routes/
- │    │    ├── expenseRoutes.js
- │    │    ├── goalRoutes.js
- │    │    ├── billRoutes.js
- │    │    └── aiRoutes.js
  │    ├── controllers/
  │    ├── models/
  │    └── utils/
@@ -112,37 +190,25 @@ src/
  │    └── App.jsx
  └── package.json
 
-🚀 Run Locally
-<<<<<<< HEAD
-Clone repo
+✅ Judge Checklist
 
-=======
-# Clone repo
->>>>>>> dfe6984ae28227167f6f013b56fccf00c7db97a9
-git clone https://github.com/SinghaniaAbhishek/kuber.git
-cd kuber
+✔ Dashboard, charts, and progress bars update instantly
+✔ CRUD (Add/Edit/Delete) for income, expense, and goals
+✔ “Mark Paid” → adds expense & resets due date
+✔ AI assistant generates accurate summaries
+✔ Confetti + badge trigger on goal completion
+✔ CSV export + Reset to mock data works
+✔ Fully responsive (mobile/tablet/desktop)
 
-Install dependencies
-npm install
+🏆 Why KUBER Wins
 
-Start backend
-cd backend
-npm start
-
-Start frontend
-cd frontend
-npm run dev
-
-
-🏆 Why KUBER Stands Out
-
-🌈 Pastel-themed professional UI (eye-soothing + elegant)
-🤖 AI summarizer for natural insights
-🎮 Gamified finance with badges & confetti
-📊 Live charts + analytics
-🧩 Full-stack integration (React + Node + MongoDB)
-💾 Persistent local & cloud data
-📱 Responsive, accessible, and delightful UX
+🌈 Eye-catching pastel & glassmorphic design
+🤖 AI summarizer gives meaningful insights
+🎮 Gamified with badges, challenges & confetti
+📊 Live-updating charts & analytics
+🧠 Intuitive UX for every user type
+💾 Syncs local + cloud data seamlessly
 
 💚 Team KUBER
+
 Building healthier financial habits — one pastel dashboard at a time.
