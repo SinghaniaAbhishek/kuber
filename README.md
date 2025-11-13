@@ -1,7 +1,4 @@
-Here’s a **cleaned-up, modernized, and professional version** of your **KUBER – Personal Finance Simplifier** README.
-It keeps your creative tone but improves structure, readability, and flow — perfect for GitHub or portfolio display.
 
----
 
 # 💰 KUBER — Personal Finance Simplifier
 
