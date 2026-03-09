@@ -242,8 +242,3 @@ src/
 ---
 
 ## 💚 Team KUBER
-
-
----
-
-Would you like me to add **badges (like React, Node.js, MongoDB, Tailwind)** at the top for a more GitHub-style aesthetic?
